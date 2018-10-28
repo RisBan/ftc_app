@@ -162,7 +162,7 @@ public class OpMode extends LinearOpMode {
             rightDrive.setPower(rightPower);
 
             if (gamepad1.a) {
-                System.out.println("hallelulha");
+                System.out.println("hallelujah");
                 telemetry.addData("a pressed", "Run Time: " + runtime.toString());
                 String update = position.runVuforiaTracker(5);
                 //sleep(5000);
