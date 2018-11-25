@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -13,15 +14,23 @@ public class Hardware{
     private DcMotor rightDrive;
     private DcMotor collector;
 
-    HardwareMap hwMap;
+    HardwareMap hwMap = null;
     //@Override
     public void runOpMode() {
-        hwMap = new HardwareMap();
+        //motors
         lift = hwMap.get(DcMotor.class, "lift");
-        hook = hwMap.get(Servo.class, "hook");
         leftDrive = hwMap.get(DcMotor.class, "leftDrive");
         rightDrive = hwMap.get(DcMotor.class, "rightDrive");
         collector = hwMap.get(DcMotor.class, "collector");
+
+        //servos
+        hook = hwMap.get(Servo.class, "hook");
+
+        //directions
+        lift.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        collector.setDirection(DcMotor.Direction.FORWARD);
     }
 
 
