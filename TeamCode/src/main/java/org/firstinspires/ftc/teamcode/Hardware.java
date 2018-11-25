@@ -14,6 +14,9 @@ public class Hardware{
     private DcMotor rightDrive;
     private DcMotor collector;
 
+    double Hook_Open = 0.0;
+    double Hook_Closed = 1.0;
+
     HardwareMap hwMap = null;
     //@Override
     public void runOpMode() {
@@ -31,6 +34,10 @@ public class Hardware{
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         collector.setDirection(DcMotor.Direction.FORWARD);
+        hook.setDirection(Servo.Direction.FORWARD);
+
+        //do we want to scale the range?
+        hook.setPosition(Hook_Closed);
     }
 
 
