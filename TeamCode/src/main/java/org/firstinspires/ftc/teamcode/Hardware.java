@@ -55,9 +55,6 @@ public class Hardware
 
     public static final double LIFT_UP_POWER    =  0.9 ;
     public static final double LIFT_DOWN_POWER  = -0.9 ;
-    public static final double LIFT_HEIGHT_ATTACH = 10;
-    public static final double LIFT_HEIGHT_DEPOSIT = 00;
-    public static final double LIFT_HEIGHT_COLLECT = 00;
 
     public static final double LATCH_OPEN_POWER  =  0.6 ;
     public static final double LATCH_CLOSE_POWER = -0.6 ;
@@ -69,16 +66,14 @@ public class Hardware
     public static final double BUCKET_DOOR_GOLD   =  0.88 ;
     public static final double BUCKET_DOOR_OPEN   =  1.0 ;
 
-    public static double Drive_Count = 0;
-
     //auto constants
     static final double ENCODER_CPR_60 = 1680;
     static final double ENCODER_CPR_40 = 1120;
 
     //auto lift constants
     static final double PINION_DIAMETER_Inches = 20.8/25.4;
-    //static final double LIFT_HEIGHT_LAND = 8.875;
-    static final double LIFT_HEIGHT_LAND = 9.4;
+    //static final double LIFT_HEIGHT = 8.875;
+    static final double LIFT_HEIGHT = 9.4;
     static final double pinion_CPI = ENCODER_CPR_60/(PINION_DIAMETER_Inches*Math.PI);
 
     //auto collector constants
@@ -112,7 +107,6 @@ public class Hardware
 
         leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
-        Drive_Count = 0;
 
         collectorDrum.setDirection(DcMotor.Direction.REVERSE);
 
@@ -164,4 +158,5 @@ public class Hardware
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-}
+ }
+
