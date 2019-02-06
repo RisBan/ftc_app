@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -46,6 +47,7 @@ public class Hardware
     public DcMotor  bucketArm    = null;
     public CRServo  latch       = null;
     public Servo    bucketBox   = null;
+    public ColorSensor colorSensor;
 
     public static final double COLLECTOR_UP_POWER    =  0.7 ;
     public static final double COLLECTOR_DOWN_POWER  = -0.35 ;
@@ -82,6 +84,9 @@ public class Hardware
     //auto drive constants
     static final double WHEEL_DIAMETER_INCHES = 4.0;
     static final double WHEEL_CPI = ENCODER_CPR_40/(WHEEL_DIAMETER_INCHES*Math.PI);
+    static final double COUNTS_PER_MOTOR_REV = 1440;
+    static final double DRIVE_GEAR_REDUCTION = 1.0;
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -142,6 +147,9 @@ public class Hardware
         bucketBox  = hwMap.get(Servo.class, "bucket_box");
         bucketBox.setDirection(Servo.Direction.REVERSE);
         bucketBox.setPosition(BUCKET_DOOR_CLOSED);
+
+        //Define and initialize ALL installed sensors.
+        colorSensor = hwMap.get(ColorSensor.class, "colorSensor");
 
     }
     public void autoInit(HardwareMap otherHwMap) {
