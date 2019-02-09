@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Hardware2 {
@@ -15,6 +16,7 @@ public class Hardware2 {
         public DcMotor  lift        = null;
         public CRServo latch       = null;
         public ColorSensor colorSensor;
+        public TouchSensor touchSensor;
 
         public static final double COLLECTOR_UP_POWER    =  0.7 ;
         public static final double COLLECTOR_DOWN_POWER  = -0.35 ;
@@ -97,6 +99,7 @@ public class Hardware2 {
 
             //Define and initialize ALL installed sensors.
             colorSensor = shwMap.get(ColorSensor.class, "color_sensor");
+            touchSensor = shwMap.get(TouchSensor.class, "touch_sensor");
 
         }
         public void autosInit(HardwareMap othersHwMap) {

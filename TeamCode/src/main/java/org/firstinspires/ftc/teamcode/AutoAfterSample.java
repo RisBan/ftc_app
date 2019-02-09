@@ -9,12 +9,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="Auto After Sample", group = "Autonomous")
 public class AutoAfterSample extends LinearOpMode {
     public String pos1 = "position 1";
     public String pos2 = "position 2";
     public String pos3 = "position 3";
+
+    private ElapsedTime pressedTime = new ElapsedTime();
+
+    //String for color seen. None=0; Red=1; Blue=2; Black=3;
+    int color = 0;
+    int backup = 0;
 
     Hardware2 robot = new Hardware2();
     @Override
@@ -30,9 +37,6 @@ public class AutoAfterSample extends LinearOpMode {
 
             // to amplify/attentuate the raw RGB measured values.
             final double SCALE_FACTOR = 255;
-
-            //String for color seen. None=0; Red=1; Blue=2; Black=3;
-            int color = 0;
 
             //covert RGB values to HSV values
             Color.RGBToHSV((int) (robot.colorSensor.red() * SCALE_FACTOR),
@@ -58,25 +62,48 @@ public class AutoAfterSample extends LinearOpMode {
                 telemetry.addData("Color:", "No color detected.");
             }
 
-            //line following
-            if (color == 3) {
-                robot.leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.leftDrive.setPower(0.5);
-                robot.leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-                telemetry.addLine("Position: Moving left side");
+            if (robot.touchSensor.isPressed() == false && backup == 0) {
+                lineFollow();
             }
-            else if (color == 1 || color == 2){
-                robot.rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.rightDrive.setPower(0.5);
-                robot.rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-                telemetry.addLine("Position: moving right side");
+            else if (robot.touchSensor.isPressed() == true) {
+                pressedTime.reset();
+                backup = 1;
+                while (opModeIsActive() && backup == 1) {
+
+                    while ((robot.touchSensor.isPressed() == true) && (pressedTime.seconds() <= 3) && (opModeIsActive())) {
+
+                    }
+                    if (robot.touchSensor.isPressed() == false) {
+                        backup = 0;
+                    } else if (pressedTime.seconds() >= 3) {
+                        finishAuto();
+                    }
+                }
             }
-            else {
-                robot.leftDrive.setPower(0.0);
-                robot.rightDrive.setPower(0.0);
             }
+
             telemetry.update();
         }
+
+    //line following
+    void lineFollow() {
+        if (color == 3) {
+            robot.leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftDrive.setPower(0.5);
+            robot.leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            telemetry.addLine("Position: Moving left side");
+        } else if (color == 1 || color == 2) {
+            robot.rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightDrive.setPower(0.5);
+            robot.rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+            telemetry.addLine("Position: moving right side");
+        } else {
+            robot.leftDrive.setPower(0.0);
+            robot.rightDrive.setPower(0.0);
+        }
+    }
+
+    void finishAuto() {
 
     }
 }
