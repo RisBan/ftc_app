@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -13,8 +14,10 @@ public class Hardware2 {
         /* Public OpMode members. */
         public DcMotor leftDrive   = null;
         public DcMotor  rightDrive  = null;
+        public DcMotor collectorArm = null;
         public DcMotor  lift        = null;
         public CRServo latch       = null;
+        public Servo middleBox = null;
         public ColorSensor colorSensor;
         public TouchSensor touchSensor;
 
@@ -51,6 +54,7 @@ public class Hardware2 {
         static final double COLLECTOR_ANGLE = -90;
 
         //auto drive constants
+        static final double TO_CRATER = 66;
         static final double WHEEL_DIAMETER_INCHES = 4.0;
         static final double WHEEL_CPI = ENCODER_CPR_40/(WHEEL_DIAMETER_INCHES*Math.PI);
         static final double COUNTS_PER_MOTOR_REV = 1440;
@@ -75,6 +79,7 @@ public class Hardware2 {
             leftDrive  = shwMap.get(DcMotor.class, "left_drive");
             rightDrive = shwMap.get(DcMotor.class, "right_drive");
             lift = shwMap.get(DcMotor.class, "lift");
+            collectorArm = shwMap.get(DcMotor.class, "collector_arm");
 
             leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
             rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
@@ -82,20 +87,26 @@ public class Hardware2 {
             lift.setDirection(DcMotor.Direction.REVERSE);
             lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+            collectorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+
             // Set all motors to zero power
             leftDrive.setPower(0);
             rightDrive.setPower(0);
             lift.setPower(0);
+            collectorArm.setPower(0);
 
             // Set all motors to run without encoders.
             // May want to use RUN_USING_ENCODERS if encoders are installed.
             leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            collectorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             // Define and initialize ALL installed servos.
             latch  = shwMap.get(CRServo.class, "latch");
             latch.setPower(0.0);
+            middleBox = shwMap.get(Servo.class, "middle_box");
+            middleBox.setPosition(0.0);
 
             //Define and initialize ALL installed sensors.
             colorSensor = shwMap.get(ColorSensor.class, "color_sensor");
@@ -112,5 +123,8 @@ public class Hardware2 {
             leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            collectorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            collectorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
