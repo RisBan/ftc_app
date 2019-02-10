@@ -19,10 +19,9 @@ public class AutoAfterSample extends LinearOpMode {
     private ElapsedTime newTime = new ElapsedTime();
 
     //String for color seen. None=0; Red=1; Blue=2; Black=3;
-    int color = 0;
-    int backup = 0;
 
-    Hardware2 robot = new Hardware2();
+
+    Hardware robot = new Hardware();
 
     //creating an array for the hue, saturation, and values information
     float hsvValues[] = {0F, 0F, 0F};
@@ -35,7 +34,7 @@ public class AutoAfterSample extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.autosInit(hardwareMap);
+        robot.autoInit(hardwareMap);
         waitForStart();
         runtime.reset();
         //while (opModeIsActive()) {
@@ -49,7 +48,7 @@ public class AutoAfterSample extends LinearOpMode {
         if (position == 2) {
             middlePosition();
         } else if (position == 1 || position == 3) {
-            while ((robot.touchSensor.isPressed() == false) && backup == 0 && (opModeIsActive())) {
+            while ((robot.touchSensor.isPressed() == false) && robot.backup == 0 && (opModeIsActive())) {
                 lineFollow();
                 sleep(20);
                 getColor();
@@ -58,14 +57,14 @@ public class AutoAfterSample extends LinearOpMode {
                 telemetry.addLine("Touch Sensor: Pressed");
                 telemetry.update();
                 pressedTime.reset();
-                backup = 1;
-                while (opModeIsActive() && backup == 1) {
+                robot.backup = 1;
+                while (opModeIsActive() && robot.backup == 1) {
 
                     while ((robot.touchSensor.isPressed() == true) && (pressedTime.seconds() <= 3) && (opModeIsActive())) {
 
                     }
                     if (robot.touchSensor.isPressed() == false) {
-                        backup = 0;
+                        robot.backup = 0;
                     } else if (pressedTime.seconds() >= 3 && (opModeIsActive())) {
                         telemetry.addData("Starting:", "finish auto");
                         telemetry.update();
@@ -83,17 +82,17 @@ public class AutoAfterSample extends LinearOpMode {
 
     //line following
     void lineFollow() {
-        if (color == 3) {
+        if (robot.color == 3) {
             robot.leftDrive.setPower(-0.5);
             robot.rightDrive.setPower(0.0);
             telemetry.addLine("Position: Moving left side");
             telemetry.update();
-        } else if (color == 1 || color == 2) {
+        } else if (robot.color == 1 || robot.color == 2) {
             robot.rightDrive.setPower(-0.5);
             robot.leftDrive.setPower(0.0);
             telemetry.addLine("Position: moving right side");
             telemetry.update();
-        } else if (color == 4) {
+        } else if (robot.color == 4) {
             robot.rightDrive.setPower(-0.35);
             robot.leftDrive.setPower(0.0);
             telemetry.addLine("Position: Twitching");
@@ -111,10 +110,10 @@ public class AutoAfterSample extends LinearOpMode {
         robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate(1050, .75, 25);
-        robot.collectorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         newTime.reset();
         while (opModeIsActive() && newTime.seconds() <= 2) {
-            robot.collectorArm.setPower(.75);
+            robot.collector.setPower(-0.75);
         }
         moveThatRobot(0.7, -55, -55, 30);
         robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -126,10 +125,10 @@ public class AutoAfterSample extends LinearOpMode {
         robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate(350, .75, 25);
-        robot.collectorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         newTime.reset();
         while (opModeIsActive() && newTime.seconds() <= 2) {
-            robot.collectorArm.setPower(.75);
+            robot.collector.setPower(-0.75);
         }
         moveThatRobot(0.7, -55, -55, 30);
         robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -140,10 +139,10 @@ public class AutoAfterSample extends LinearOpMode {
         robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate(1000, .75, 25);
-        robot.collectorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         newTime.reset();
         while (opModeIsActive() && newTime.seconds() <= 2) {
-            robot.collectorArm.setPower(.75);
+            robot.collector.setPower(-0.75);
         }
         moveThatRobot(0.7, -57, -57, 30);
         robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -209,19 +208,19 @@ public class AutoAfterSample extends LinearOpMode {
 
         //setting number values for each color
         if ((hsvValues[0] <= 360 && hsvValues[0] >= 275) || (hsvValues[0] >= 0 && hsvValues[0] <= 10)) {
-            color = 1;
+            robot.color = 1;
             telemetry.addData("Color:", "Red");
         } else if (hsvValues[0] >= 175 && hsvValues[0] <= 250) {
-            color = 2;
+            robot.color = 2;
             telemetry.addData("Color:", "Blue");
         } else if (hsvValues[0] <= 125 && hsvValues[0] >= 60) {
-            color = 3;
+            robot.color = 3;
             telemetry.addData("Color:", "Black");
         } else if ((hsvValues[0] >= 130 && hsvValues[0] <= 170) || (hsvValues[0] <= 30 && hsvValues[0] >= 20)) {
-            color = 4;
+            robot.color = 4;
             telemetry.addData("Color:", "Middle color");
         } else {
-            color = 0;
+            robot.color = 0;
             telemetry.addData("Color:", hsvValues[0]);
             telemetry.update();
         }
@@ -271,7 +270,7 @@ public class AutoAfterSample extends LinearOpMode {
     }
 
     public void middlePosition() {
-        while ((robot.touchSensor.isPressed() == false) && backup == 0 && (opModeIsActive())) {
+        while ((robot.touchSensor.isPressed() == false) && robot.backup == 0 && (opModeIsActive())) {
             robot.rightDrive.setPower(0.4);
             robot.leftDrive.setPower(0.4);
         }
@@ -279,14 +278,14 @@ public class AutoAfterSample extends LinearOpMode {
             telemetry.addLine("Touch Sensor: Pressed");
             telemetry.update();
             pressedTime.reset();
-            backup = 1;
-            while (opModeIsActive() && backup == 1) {
+            robot.backup = 1;
+            while (opModeIsActive() && robot.backup == 1) {
 
                 while ((robot.touchSensor.isPressed() == true) && (pressedTime.seconds() <= 3) && (opModeIsActive())) {
 
                 }
                 if (robot.touchSensor.isPressed() == false) {
-                    backup = 0;
+                    robot.backup = 0;
                 } else if (pressedTime.seconds() >= 3 && (opModeIsActive())) {
                     telemetry.addData("Starting:", "finish auto");
                     telemetry.update();

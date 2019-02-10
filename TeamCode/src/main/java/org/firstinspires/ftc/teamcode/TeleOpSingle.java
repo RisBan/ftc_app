@@ -67,8 +67,11 @@ public class TeleOpSingle extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            if (gamepad1.a) {
-                robot.middleBox.setPosition(.25);
+            if (gamepad1.y) {
+                robot.middleBox.setPosition((robot.middleBox.getPosition() + 45));
+            }
+            else if (gamepad1.a) {
+                robot.middleBox.setPosition((robot.middleBox.getPosition() - 45));
             }
 
             // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
