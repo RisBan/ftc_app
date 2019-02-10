@@ -43,7 +43,7 @@ public class TeleOpSingle extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private static long X_DEBOUNCE = 20;
     long lastX;
-    Hardware2 robot           = new Hardware2();
+    Hardware robot           = new Hardware();
 
     @Override
     public void runOpMode() {
@@ -68,10 +68,10 @@ public class TeleOpSingle extends LinearOpMode {
         while (opModeIsActive()) {
 
             if (gamepad1.y) {
-                robot.middleBox.setPosition((robot.middleBox.getPosition() + 45));
+                robot.transport.setPosition((robot.transport.getPosition() + 45));
             }
             else if (gamepad1.a) {
-                robot.middleBox.setPosition((robot.middleBox.getPosition() - 45));
+                robot.transport.setPosition((robot.transport.getPosition() - 45));
             }
 
             // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
