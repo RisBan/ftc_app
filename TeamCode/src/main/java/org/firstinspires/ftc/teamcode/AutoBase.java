@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -50,17 +52,22 @@ public class AutoBase extends LinearOpMode {
     static final double lowerLift = Hardware.LIFT_HEIGHT * Hardware.pinion_CPI;
     static final double lowerCollector = ((Hardware.ENCODER_CPR_60 / (360 / Hardware.COLLECTOR_ANGLE)) / 3) * 2;
     Boolean crater = true;
+    int position = 1;
 
     // Timers
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime latchTime = new ElapsedTime();
     private ElapsedTime motorTime = new ElapsedTime();
+    private ElapsedTime newTime = new ElapsedTime();
+    private ElapsedTime pressedTime = new ElapsedTime();
 
 
     Hardware robot = new Hardware();
+
+    //color sensor variables
     float hsvValues[] = {0F, 0F, 0F};
     final float values[] = hsvValues;
-    int color = 0;
+    final double SCALE_FACTOR = 255;
 
 
     @Override
@@ -117,6 +124,44 @@ public class AutoBase extends LinearOpMode {
             rotate(630 , 1, 3);
             Sample();
             //findLine();
+
+            getColor();
+            robot.rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            if (position == 2) {
+                middlePosition();
+            } else if (position == 1 || position == 3) {
+                while ((robot.touchSensor.isPressed() == false) && robot.backup == 0 && (opModeIsActive())) {
+                    lineFollow();
+                    sleep(20);
+                    getColor();
+                }
+                if ((robot.touchSensor.isPressed() == true) && opModeIsActive()) {
+                    telemetry.addLine("Touch Sensor: Pressed");
+                    telemetry.update();
+                    pressedTime.reset();
+                    robot.backup = 1;
+                    while (opModeIsActive() && robot.backup == 1) {
+
+                        while ((robot.touchSensor.isPressed() == true) && (pressedTime.seconds() <= 3) && (opModeIsActive())) {
+
+                        }
+                        if (robot.touchSensor.isPressed() == false) {
+                            robot.backup = 0;
+                        } else if (pressedTime.seconds() >= 3 && (opModeIsActive())) {
+                            telemetry.addData("Starting:", "finish auto");
+                            telemetry.update();
+                            if (position == 3) {
+                                finishAuto3();
+                            } else if (position == 1) {
+                                finishAuto1();
+                            }
+                        }
+                    }
+                }
+            }
+            telemetry.update();
 
         }
 
@@ -310,7 +355,7 @@ public class AutoBase extends LinearOpMode {
 
 
         public Integer Sample () {
-        int position = 1;
+        position = 1;
 
             if (opModeIsActive()) {
                 /** Activate Tensor Flow Object Detection. */
@@ -383,39 +428,125 @@ public class AutoBase extends LinearOpMode {
 
 
         }
-
-
-
-
-    public String getColor () {
-        String colorString = "None";
-        //setting number values for each color
-        if (hsvValues[0]<=360 && hsvValues[0]>=275) {
-            color = 1;
-            colorString = "Red";
-            telemetry.addData("Color:", "Red");
+    //line following
+    void lineFollow() {
+        if (robot.color == 3) {
+            robot.leftDrive.setPower(-0.5);
+            robot.rightDrive.setPower(0.0);
+            telemetry.addLine("Position: Moving left side");
+            telemetry.update();
+        } else if (robot.color == 1 || robot.color == 2) {
+            robot.rightDrive.setPower(-0.5);
+            robot.leftDrive.setPower(0.0);
+            telemetry.addLine("Position: moving right side");
+            telemetry.update();
+        } else if (robot.color == 4) {
+            robot.rightDrive.setPower(-0.35);
+            robot.leftDrive.setPower(0.0);
+            telemetry.addLine("Position: Twitching");
+            telemetry.update();
+        } else {
+            robot.leftDrive.setPower(0.0);
+            robot.rightDrive.setPower(0.0);
+            telemetry.addData("Moving:", "No");
+            telemetry.update();
         }
-        else if (hsvValues[0]>=175 && hsvValues[0]<=250) {
-            color = 2;
-            colorString = "Blue";
-            telemetry.addData("Color:", "Blue");
-        }
-        else if (hsvValues[0]<=125 && hsvValues[0]>=60) {
-            color = 3;
-            colorString = "Black";
-
-            telemetry.addData("Color:", "Black");
-        }
-        else {
-            color = 0;
-            colorString = "None";
-
-            telemetry.addData("Color:", "No color detected.");
-        }
-        return colorString;
-
     }
 
+    void finishAuto3() {
+        moveThatRobot(.4, 6, 6, 20);
+        robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotate(1050, .75, 25);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        newTime.reset();
+        while (opModeIsActive() && newTime.seconds() <= 2) {
+            robot.collector.setPower(-0.75);
+        }
+        moveThatRobot(0.7, -55, -55, 30);
+        robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    void finishAuto1() {
+        moveThatRobot(.4, 6, 6, 20);
+        robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotate(350, .75, 25);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        newTime.reset();
+        while (opModeIsActive() && newTime.seconds() <= 2) {
+            robot.collector.setPower(-0.75);
+        }
+        moveThatRobot(0.7, -55, -55, 30);
+        robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    void finishAuto2() {
+        moveThatRobot(.4,4,4,20);
+        robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotate(1000, .75, 25);
+        robot.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        newTime.reset();
+        while (opModeIsActive() && newTime.seconds() <= 2) {
+            robot.collector.setPower(-0.75);
+        }
+        moveThatRobot(0.7, -57, -57, 30);
+        robot.rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    public void getColor() {
+
+        Color.RGBToHSV((int) (robot.colorSensor.red() * SCALE_FACTOR),
+                (int) (robot.colorSensor.green() * SCALE_FACTOR),
+                (int) (robot.colorSensor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        //setting number values for each color
+        if ((hsvValues[0] <= 360 && hsvValues[0] >= 275) || (hsvValues[0] >= 0 && hsvValues[0] <= 10)) {
+            robot.color = 1;
+            telemetry.addData("Color:", "Red");
+        } else if (hsvValues[0] >= 175 && hsvValues[0] <= 250) {
+            robot.color = 2;
+            telemetry.addData("Color:", "Blue");
+        } else if (hsvValues[0] <= 125 && hsvValues[0] >= 60) {
+            robot.color = 3;
+            telemetry.addData("Color:", "Black");
+        } else if ((hsvValues[0] >= 130 && hsvValues[0] <= 170) || (hsvValues[0] <= 30 && hsvValues[0] >= 20)) {
+            robot.color = 4;
+            telemetry.addData("Color:", "Middle color");
+        } else {
+            robot.color = 0;
+            telemetry.addData("Color:", hsvValues[0]);
+            telemetry.update();
+        }
+    }
+    public void middlePosition() {
+        while ((robot.touchSensor.isPressed() == false) && robot.backup == 0 && (opModeIsActive())) {
+            robot.rightDrive.setPower(0.4);
+            robot.leftDrive.setPower(0.4);
+        }
+        if ((robot.touchSensor.isPressed() == true) && opModeIsActive()) {
+            telemetry.addLine("Touch Sensor: Pressed");
+            telemetry.update();
+            pressedTime.reset();
+            robot.backup = 1;
+            while (opModeIsActive() && robot.backup == 1) {
+
+                while ((robot.touchSensor.isPressed() == true) && (pressedTime.seconds() <= 3) && (opModeIsActive())) {
+
+                }
+                if (robot.touchSensor.isPressed() == false) {
+                    robot.backup = 0;
+                } else if (pressedTime.seconds() >= 3 && (opModeIsActive())) {
+                    telemetry.addData("Starting:", "finish auto");
+                    telemetry.update();
+                    finishAuto2();
+                }
+            }
+        }
+    }
 
     }
 
